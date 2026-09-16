@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>James Lee Jimenez — AI Operations &amp; Model Evaluation</title>
+<meta name="description" content="James Lee Jimenez evaluates and trains large language models, designs prompts and AI workflows, and has five years running business operations. New Jersey, open to NYC and remote.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E8EBEE;
+    --panel:#F3F5F6;
+    --ink:#141E28;
+    --ink-2:#56646F;
+    --rule:#C4CCD3;
+    --mark:#D9F04B;
+    --mark-ink:#141E28;
+    --focus:#1B3FB8;
+    --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
+    --text:"Newsreader",Georgia,"Times New Roman",serif;
+    --pad:clamp(1.25rem,5vw,4.5rem);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#121920;
+      --panel:#1A232B;
+      --ink:#E4EAEF;
+      --ink-2:#94A3AF;
+      --rule:#2C3843;
+      --mark:#D9F04B;
+      --mark-ink:#111820;
+      --focus:#9FC0FF;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#121920;
+    --panel:#1A232B;
+    --ink:#E4EAEF;
+    --ink-2:#94A3AF;
+    --rule:#2C3843;
+    --mark:#D9F04B;
+    --mark-ink:#111820;
+    --focus:#9FC0FF;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--text);
+    font-size:clamp(1rem,.96rem + .18vw,1.125rem);
+    font-weight:400;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%}
+  a{color:inherit}
+  a:focus-visible,button:focus-visible{
+    outline:2px solid var(--focus);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+  .wrap{max-width:1140px;margin:0 auto;padding-left:var(--pad);padding-right:var(--pad)}
+
+  /* ---------- top bar ---------- */
+  .bar{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb,var(--paper) 88%,transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--rule);
+  }
+  .bar-in{
+    display:flex;align-items:center;gap:1.5rem;
+    min-height:58px;
+  }
+  .sig{
+    font-family:var(--display);
+    font-weight:800;
+    letter-spacing:-.02em;
+    font-size:1rem;
+    text-decoration:none;
+    margin-right:auto;
+  }
+  .bar nav{display:flex;gap:1.35rem}
+  .bar nav a{
+    font-family:var(--display);
+    font-size:.86rem;
+    font-weight:500;
+    text-decoration:none;
+    color:var(--ink-2);
+    padding:.2rem 0;
+  }
+  .bar nav a:hover{color:var(--ink);box-shadow:inset 0 -2px 0 var(--mark)}
+  @media (max-width:760px){.bar nav{display:none}}
+  .theme{
+    background:none;border:1px solid var(--rule);color:var(--ink-2);
+    font-family:var(--display);font-size:.78rem;font-weight:500;
+    padding:.3rem .6rem;border-radius:999px;cursor:pointer;
+  }
+  .theme:hover{color:var(--ink);border-color:var(--ink-2)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:clamp(3.5rem,9vw,7rem) 0 clamp(2.5rem,6vw,4rem)}
+  h1{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(2.35rem,1.1rem + 6.1vw,5.4rem);
+    line-height:.98;
+    letter-spacing:-.033em;
+    margin:0 0 1.75rem;
+    max-width:15ch;
+  }
+  .mark{position:relative;display:inline;white-space:nowrap}
+  .mark::before{
+    content:"";position:absolute;
+    left:-.06em;right:-.06em;top:.12em;bottom:.1em;
+    background:var(--mark);
+    z-index:-1;
+    transform:scaleX(0);transform-origin:left center;
+    animation:sweep .62s cubic-bezier(.22,.7,.3,1) .35s forwards;
+  }
+  @keyframes sweep{to{transform:scaleX(1)}}
+  @media (prefers-reduced-motion: reduce){
+    .mark::before{animation:none;transform:scaleX(1)}
+  }
+  .lede{
+    max-width:58ch;
+    font-size:clamp(1.06rem,1rem + .35vw,1.32rem);
+    line-height:1.58;
+    margin:0 0 2.25rem;
+  }
+  .lede em{font-style:italic}
+  .actions{display:flex;flex-wrap:wrap;gap:.65rem;margin-bottom:clamp(2.5rem,6vw,4rem)}
+  .btn{
+    font-family:var(--display);font-weight:600;font-size:.92rem;
+    text-decoration:none;
+    padding:.66rem 1.15rem;
+    border:1px solid var(--ink);
+    border-radius:999px;
+    line-height:1;
+    display:inline-flex;align-items:center;
+  }
+  .btn:hover{background:var(--ink);color:var(--paper)}
+  .btn.solid{background:var(--ink);color:var(--paper)}
+  .btn.solid:hover{background:var(--mark);color:var(--mark-ink);border-color:var(--mark)}
+
+  .facts{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--rule);
+  }
+  .facts div{
+    padding:1.15rem 1.35rem 1.15rem 0;
+    border-right:1px solid var(--rule);
+    font-family:var(--display);
+    font-size:.95rem;
+    font-weight:500;
+    line-height:1.38;
+  }
+  .facts div:last-child{border-right:0}
+  .facts b{display:block;font-weight:800;font-size:1.02rem;letter-spacing:-.01em}
+  .facts span{color:var(--ink-2);font-weight:400;font-size:.88rem}
+  @media (max-width:820px){
+    .facts{grid-template-columns:repeat(2,1fr)}
+    .facts div{border-bottom:1px solid var(--rule);padding-right:1rem}
+    .facts div:nth-child(2n){border-right:0}
+    .facts div:nth-last-child(-n+2){border-bottom:0}
+  }
+
+  /* ---------- sections ---------- */
+  section{border-top:1px solid var(--rule);padding:clamp(2.75rem,6vw,4.5rem) 0}
+  .row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,3.1fr);gap:clamp(1.5rem,4vw,3.5rem)}
+  .row-head{position:sticky;top:78px;align-self:start}
+  .row-head h2{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:1.02rem;
+    letter-spacing:-.005em;
+    margin:0 0 .35rem;
+  }
+  .row-head p{margin:0;color:var(--ink-2);font-size:.9rem;line-height:1.45;max-width:24ch}
+  @media (max-width:820px){
+    .row{grid-template-columns:1fr;gap:1.5rem}
+    .row-head{position:static}
+    .row-head h2{font-size:1.3rem}
+    .row-head p{max-width:46ch}
+  }
+
+  h3{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(1.22rem,1.1rem + .5vw,1.6rem);
+    letter-spacing:-.018em;
+    line-height:1.2;
+    margin:0 0 .55rem;
+  }
+  p{margin:0 0 1rem;max-width:66ch}
+  p:last-child{margin-bottom:0}
+
+  .stack > * + *{
+    margin-top:2.15rem;
+    padding-top:2.15rem;
+    border-top:1px solid var(--rule);
+  }
+
+  .meta{
+    font-family:var(--display);
+    font-size:.82rem;
+    font-weight:500;
+    color:var(--ink-2);
+    margin:0 0 .5rem;
+  }
+  .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin:.95rem 0 0;padding:0;list-style:none}
+  .tags li{
+    font-family:var(--display);font-size:.78rem;font-weight:500;
+    border:1px solid var(--rule);
+    padding:.24rem .6rem;border-radius:999px;
+    color:var(--ink-2);
+  }
+  .repo{
+    font-family:var(--display);font-weight:600;font-size:.88rem;
+    text-decoration:none;
+    box-shadow:inset 0 -2px 0 var(--mark);
+    padding-bottom:1px;
+    display:inline-block;margin-top:.9rem;
+  }
+  .repo:hover{background:var(--mark);color:var(--mark-ink)}
+
+  /* job list */
+  .job{display:grid;grid-template-columns:7.5rem minmax(0,1fr);gap:1.25rem}
+  .job .yrs{font-family:var(--display);font-weight:600;font-size:.86rem;color:var(--ink-2);padding-top:.35rem}
+  .job h3{font-size:1.16rem;margin-bottom:.15rem}
+  .job .co{font-family:var(--display);font-size:.88rem;font-weight:500;color:var(--ink-2);margin:0 0 .6rem}
+  .job ul{margin:0;padding-left:1.05rem}
+  .job li{margin-bottom:.3rem;max-width:64ch}
+  @media (max-width:560px){.job{grid-template-columns:1fr;gap:.35rem}.job .yrs{padding-top:0}}
+
+  /* toolkit */
+  .kit{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+  .kit div{background:var(--panel);padding:1.15rem 1.25rem}
+  .kit h4{font-family:var(--display);font-weight:600;font-size:.92rem;margin:0 0 .45rem}
+  .kit p{font-size:.94rem;color:var(--ink-2);margin:0;line-height:1.5}
+
+  /* credentials */
+  .creds{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2rem}
+  .creds h4{font-family:var(--display);font-weight:600;font-size:.92rem;margin:0 0 .6rem}
+  .creds ul{margin:0;padding:0;list-style:none}
+  .creds li{margin-bottom:.45rem;font-size:.97rem;line-height:1.45}
+  .creds small{display:block;color:var(--ink-2);font-size:.84rem;font-family:var(--display)}
+
+  /* contact */
+  .contact h2{
+    font-family:var(--display);font-weight:800;
+    font-size:clamp(1.9rem,1.2rem + 3vw,3.4rem);
+    letter-spacing:-.03em;line-height:1.02;margin:0 0 1.15rem;max-width:17ch;
+  }
+  .contact p{font-size:1.1rem;max-width:52ch}
+  footer{border-top:1px solid var(--rule);padding:1.6rem 0 2.6rem;color:var(--ink-2);font-family:var(--display);font-size:.82rem}
+  .foot-in{display:flex;flex-wrap:wrap;gap:.9rem 1.6rem;align-items:baseline}
+  footer a{text-decoration:none}
+  footer a:hover{color:var(--ink);box-shadow:inset 0 -2px 0 var(--mark)}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap bar-in">
+    <a class="sig" href="#top">James Lee Jimenez</a>
+    <nav>
+      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#toolkit">Toolkit</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="theme" id="theme" type="button" aria-label="Switch colour theme">Theme</button>
+  </div>
+</div>
+
+<main id="top">
+
+  <div class="wrap hero">
+    <h1>I find <span class="mark">where AI breaks</span>, then write down how to fix it.</h1>
+    <p class="lede">I'm James. I evaluate and train large language models at Mercor, and before that I spent five years running the operations side of small businesses. That combination is the whole point. I can tell you whether a model's answer is actually good, and whether the workflow around it works for the people who have to use it every day.</p>
+    <div class="actions">
+      <a class="btn solid" href="mailto:leejimenezjames@gmail.com">Email me</a>
+      <a class="btn" href="https://www.linkedin.com/in/james-lee-jimenez">LinkedIn</a>
+      <a class="btn" href="https://github.com/james-lee-jimenez">GitHub</a>
+      <a class="btn" href="James-Lee-Jimenez-Resume.pdf">Résumé, PDF</a>
+    </div>
+    <div class="facts">
+      <div><b>AI Training Specialist</b><span>Mercor, 2026 to now</span></div>
+      <div><b>5 years in operations</b><span>Payroll, vendors, scheduling, service</span></div>
+      <div><b>English, Spanish, French</b><span>Native Spanish, fluent English</span></div>
+      <div><b>New Jersey</b><span>Open to NYC and remote</span></div>
+    </div>
+  </div>
+
+  <section id="work">
+    <div class="wrap row">
+      <div class="row-head">
+        <h2>What I do</h2>
+        <p>Three things, and they feed each other.</p>
+      </div>
+      <div class="stack">
+
+        <div>
+          <h3>Evaluate and train language models</h3>
+          <p>I build the environments a model gets tested in, write the criteria it gets scored against, run the model through them, and document exactly where it went wrong. Not a thumbs up or a thumbs down, but a written record another person can act on. Most of my work sits in business and HR scenarios, where the right answer depends on policy, timing, and who is asking.</p>
+          <ul class="tags"><li>Rubric design</li><li>Trajectory review</li><li>Failure analysis</li><li>Human feedback</li><li>Reviewer calibration</li></ul>
+        </div>
+
+        <div>
+          <h3>Design prompts and the workflows around them</h3>
+          <p>A prompt that works once is a trick. A prompt that works on the tenth try, in someone else's hands, with messy inputs, is a tool. I write prompts with the inputs named, the output shape fixed, and the known failure modes written down underneath, then I test them against cases built to break them.</p>
+          <ul class="tags"><li>Prompt engineering</li><li>Output schemas</li><li>Test cases</li><li>Version control</li><li>Handoff documentation</li></ul>
+        </div>
+
+        <div>
+          <h3>Run the operations underneath</h3>
+          <p>Before AI, I ran payroll, scheduling, vendors, billing, and customer complaints for two businesses. That is why I care about whether a process survives contact with a busy team on a Friday afternoon. Good AI work and good operations work are the same skill pointed at different problems.</p>
+          <ul class="tags"><li>Process design</li><li>Customer success</li><li>Financial admin</li><li>Team coaching</li><li>Vendor management</li></ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="wrap row">
+      <div class="row-head">
+        <h2>Selected work</h2>
+        <p>What I have actually built and shipped.</p>
+      </div>
+      <div class="stack">
+
+        <div>
+          <p class="meta">Mercor, 2026 to now</p>
+          <h3>Evaluation environments for business and HR scenarios</h3>
+          <p>I own tasks end to end. I build the fictional company a model has to operate inside, write the documents and records it has to reason over, set the task and the answer key, then write the criteria a grader scores against. After that I run models through it, read every step of the run, and write up why each one passed or failed.</p>
+          <p>The hard part is not writing the task. It is making a task that is difficult for a good reason, where a strong model fails because it skipped a real step, not because the wording was tricky. Every criterion has to point at one sentence in the source material, or it is not a criterion, it is an opinion.</p>
+          <ul class="tags"><li>Scenario design</li><li>Answer keys</li><li>Grading criteria</li><li>Model comparison</li><li>Written failure analysis</li></ul>
+        </div>
+
+        <div>
+          <p class="meta">Open source</p>
+          <h3>LLM evaluation toolkit</h3>
+          <p>The rubrics, report templates, and scoring script I use to keep evaluations consistent across runs and across people. It includes scored rubrics for instruction following, factual accuracy, and tone, a worked example comparing two model answers on the same task, and a small Python script that turns a folder of scores into per criterion averages and a reviewer agreement check.</p>
+          <a class="repo" href="https://github.com/james-lee-jimenez/llm-evaluation-toolkit">github.com/james-lee-jimenez/llm-evaluation-toolkit</a>
+        </div>
+
+        <div>
+          <p class="meta">Open source</p>
+          <h3>Prompt library for business teams</h3>
+          <p>Prompts for customer success, operations, hiring, and research, written so a non technical person can pick one up and use it. Each one lists what you have to give it, what comes back, the failure modes I hit while testing, and the fix. Versioned, so you can see what changed and why.</p>
+          <a class="repo" href="https://github.com/james-lee-jimenez/prompt-library">github.com/james-lee-jimenez/prompt-library</a>
+        </div>
+
+        <div>
+          <p class="meta">Ridgemont Cleaners and NY Spot Cleaners, 2020 to 2025</p>
+          <h3>Rebuilding a small business back office</h3>
+          <p>Two family run service businesses where the books, the schedule, and the customer complaints all landed on the same desk. I took over payroll, invoicing, vendor accounts, and staff scheduling, wrote down the processes that only existed in someone's head, and trained the team on them. Customer escalations came to me, in English or Spanish, and stopped with me.</p>
+          <ul class="tags"><li>Payroll</li><li>Invoicing</li><li>Scheduling</li><li>Onboarding</li><li>Escalations</li></ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="wrap row">
+      <div class="row-head">
+        <h2>Where I've worked</h2>
+        <p>Most recent first.</p>
+      </div>
+      <div class="stack">
+
+        <div class="job">
+          <div class="yrs">2026 — now</div>
+          <div>
+            <h3>AI Training Specialist</h3>
+            <p class="co">Mercor</p>
+            <ul>
+              <li>Evaluate and train large language models on reasoning, instruction following, factual accuracy, and how they hold a conversation.</li>
+              <li>Design and test prompts across business use cases, then document what makes them hold up or fall apart.</li>
+              <li>Run quality reviews against project guidelines and AI safety standards.</li>
+              <li>Read model outputs step by step, find the weak points, and write structured feedback a team can act on.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="yrs">2025 — 2026</div>
+          <div>
+            <h3>Customer Success &amp; Business Development Representative</h3>
+            <p class="co">Infinova Management</p>
+            <ul>
+              <li>Owned client relationships through the full sales and support cycle.</li>
+              <li>Worked out what customers actually needed, then matched them to a solution instead of a pitch.</li>
+              <li>Pulled in internal teams where retention or satisfaction was at risk.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="yrs">2023 — 2025</div>
+          <div>
+            <h3>Operations Manager</h3>
+            <p class="co">NY Spot Cleaners</p>
+            <ul>
+              <li>Ran daily operations, from opening the doors to closing the books.</li>
+              <li>Handled hiring, onboarding, scheduling, coaching, and performance conversations.</li>
+              <li>Managed inventory, vendors, payroll, and financial reporting.</li>
+              <li>Rewrote the workflows that were costing the team time, and kept quality consistent across shifts.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="yrs">2020 — 2023</div>
+          <div>
+            <h3>Operations, Finance &amp; Customer Success Manager</h3>
+            <p class="co">Ridgemont Cleaners</p>
+            <ul>
+              <li>Ran finance, payroll, scheduling, billing, and customer service for the business.</li>
+              <li>Kept the reporting and documentation accurate, and the sensitive parts private.</li>
+              <li>Sat between ownership, staff, vendors, and customers so nothing got lost between them.</li>
+              <li>Supported the owner on planning and day to day business decisions.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="yrs">2022 — now</div>
+          <div>
+            <h3>Independent Delivery &amp; Logistics Contractor</h3>
+            <p class="co">Frayt</p>
+            <ul>
+              <li>Same day and scheduled deliveries for business customers, on my own schedule alongside everything else.</li>
+              <li>Route planning, delivery windows, proof of delivery, and direct customer communication.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="toolkit">
+    <div class="wrap row">
+      <div class="row-head">
+        <h2>Toolkit</h2>
+        <p>What I use, and what I use it for.</p>
+      </div>
+      <div>
+        <div class="kit">
+          <div><h4>Model evaluation</h4><p>Rubric writing, scoring, trajectory review, reviewer calibration, failure write ups.</p></div>
+          <div><h4>Models I test against</h4><p>Claude, ChatGPT, Gemini, Perplexity, Microsoft Copilot, Grok.</p></div>
+          <div><h4>Prompting</h4><p>Structured prompts, output schemas, test case design, versioning.</p></div>
+          <div><h4>Documentation</h4><p>Markdown, Notion, Google Workspace, Microsoft Office, process write ups and SOPs.</p></div>
+          <div><h4>Coordination</h4><p>Slack, Trello, Zoom, cross team handoffs, stakeholder updates.</p></div>
+          <div><h4>Business systems</h4><p>Payroll, invoicing, scheduling, inventory, vendor accounts, financial reporting.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="credentials">
+    <div class="wrap row">
+      <div class="row-head">
+        <h2>Education and credentials</h2>
+        <p>Where the formal training came from.</p>
+      </div>
+      <div class="creds">
+        <div>
+          <h4>Education</h4>
+          <ul>
+            <li>Rutgers University, New Brunswick<small>Bachelor's programme, 2022 to 2026</small></li>
+            <li>North Bergen High School<small>Diploma, 2019 to 2022</small></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Certifications</h4>
+          <ul>
+            <li>Project Management Professional Certificate</li>
+            <li>Financial Modeling &amp; Valuation Analyst</li>
+            <li>Certified AI &amp; Machine Learning Professional</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Languages</h4>
+          <ul>
+            <li>Spanish<small>Native</small></li>
+            <li>English<small>Fluent</small></li>
+            <li>French<small>Intermediate</small></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <h2>If you need someone who can judge AI output and fix the process around it, email me.</h2>
+      <p>I reply the same day. Happy to walk through a sample evaluation, a rubric, or a prompt I have written, and explain the reasoning behind it.</p>
+      <div class="actions" style="margin-top:1.75rem;margin-bottom:0">
+        <a class="btn solid" href="mailto:leejimenezjames@gmail.com">leejimenezjames@gmail.com</a>
+        <a class="btn" href="https://www.linkedin.com/in/james-lee-jimenez">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>James Lee Jimenez, New Jersey</span>
+    <a href="mailto:leejimenezjames@gmail.com">leejimenezjames@gmail.com</a>
+    <a href="https://www.linkedin.com/in/james-lee-jimenez">LinkedIn</a>
+    <a href="https://github.com/james-lee-jimenez">GitHub</a>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var btn = document.getElementById('theme');
+    var root = document.documentElement;
+    try{
+      var saved = localStorage.getItem('jlj-theme');
+      if(saved){ root.setAttribute('data-theme', saved); }
+    }catch(e){}
+    btn.addEventListener('click', function(){
+      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var cur = root.getAttribute('data-theme') || (dark ? 'dark' : 'light');
+      var next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try{ localStorage.setItem('jlj-theme', next); }catch(e){}
+    });
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){
+      a.addEventListener('click', function(e){
+        var el = document.querySelector(a.getAttribute('href'));
+        if(!el) return;
+        e.preventDefault();
+        el.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
+      });
+    });
+  })();
+</script>
+</body>
+</html>
